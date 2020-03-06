@@ -3,7 +3,7 @@
 
 ![GUI of this app](https://user-images.githubusercontent.com/20160167/76059249-ae8ca080-5fc1-11ea-8d7f-ebb59d7cd77f.png)
 
-## Demo Video (Youtube)
+## Demo (Youtube)
 [![Demo video(Youtube)](http://img.youtube.com/vi/8b_MIXw8i04/0.jpg)](http://www.youtube.com/watch?v=8b_MIXw8i04 "Demo video")
 
 ## 시작하기
