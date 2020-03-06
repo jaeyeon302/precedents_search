@@ -3,6 +3,9 @@
 
 ![GUI of this app](https://user-images.githubusercontent.com/20160167/76059249-ae8ca080-5fc1-11ea-8d7f-ebb59d7cd77f.png)
 
+## Demo Video (Youtube)
+[![Demo video(Youtube)](http://img.youtube.com/vi/8b_MIXw8i04/0.jpg)](http://www.youtube.com/watch?v=8b_MIXw8i04 "Demo video")
+
 ## 시작하기
 ### 아래의 것들이 필요해요!  
 각각의 링크에 설치 방법이 설명되어 있는 홈페이지가 링크되어있습니다.
