@@ -8,9 +8,9 @@
 각각의 링크에 설치 방법이 설명되어 있는 홈페이지가 링크되어있습니다.
 1. [pytnon3](https://www.python.org/downloads/)
 2. modules
-  - [beautifulsoup4](https://pypi.org/project/beautifulsoup4/)
-  - [PyQt5](https://pypi.org/project/PyQt5/)
-  - [python-docx](https://python-docx.readthedocs.io/en/latest/user/install.html)
+    - [beautifulsoup4](https://pypi.org/project/beautifulsoup4/)
+    - [PyQt5](https://pypi.org/project/PyQt5/)
+    - [python-docx](https://python-docx.readthedocs.io/en/latest/user/install.html)
 
 ### 실행방법
 `src/app.py` 이 프로그램을 돌리는 __main__ 파일입니다.
