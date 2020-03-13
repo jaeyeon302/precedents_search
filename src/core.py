@@ -21,7 +21,6 @@ def __get_bs_obj(url):
 
 
 def __parse_pan(txt):
-    print(txt)
     txt_lines = txt.splitlines()
     next_lines = txt_lines[1:]
     contents = [None for i in range(0, 5)]
@@ -46,6 +45,18 @@ def __parse_pan(txt):
     return contents
 
 
+def __split_number_list(txt):
+    otxt = ""
+    for c, next_c in zip(txt, txt[1:]):
+        if (c == "[" or c == "(") and next_c.isnumeric():
+            otxt += "\n"
+        elif c in "가나라마바사아자차카타파하" and next_c == ".":
+            otxt += "\n"
+        otxt += c
+    otxt += txt[-1]
+    return otxt
+
+
 def get_pan(pan_num):
     url = "{}/판례/({})".format(__BASE_URL, pan_num)
     website = __get_bs_obj(parse.quote(url))  # handle the hangeul url
@@ -56,6 +67,7 @@ def get_pan(pan_num):
     website = __get_bs_obj(__BASE_URL+"/"+pansrc_url)
     contents = website.body.find('div', {'class': 'pgroup'}).text
     contents = __parse_pan(contents)
+    contents = [__split_number_list(txt) for txt in contents]
     contents.append(pan_num)
     return Pan(*contents)
 
@@ -84,7 +96,8 @@ def save_pans(pans, ofilename, p_check=True, y_check=True, j_check=True, r_check
         if a_check and pan.allcon:
             doc.add_heading("전문", level=2)
             doc.add_paragraph(pan.allcon)
-        doc.add_heading("내용이 없습니다", level=2)
+        else:
+            doc.add_heading("내용이 없습니다", level=2)
 
     doc.save(ofilename)
     print("save: {}".format(os.path.abspath(ofilename)))
