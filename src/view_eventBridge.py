@@ -1,5 +1,5 @@
 import os
-from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import QMessageBox, QInputDialog, QLineEdit
 from core import get_pan, save_pans
 
 
@@ -97,28 +97,29 @@ class EventBridge():
 
     def save_btn_handler(self):
         nums = [p.num for p in self._pans]
-        ofilename = "./{}".format(nums)
         pansi_check = self.view.pansi_check.isChecked()
         yozi_check = self.view.yozi_check.isChecked()
         jomun_check = self.view.jomun_check.isChecked()
         refpan_check = self.view.refpan_check.isChecked()
         allcon_check = self.view.allcon_check.isChecked()
-
-        if pansi_check:
-            ofilename += "_판시사항"
-        if yozi_check:
-            ofilename += "_판결요지"
-        if jomun_check:
-            ofilename += "_참조조문"
-        if refpan_check:
-            ofilename += "_참조판례"
-        if allcon_check:
-            ofilename += "_전문"
-
-        ofilename += ".docx"
-        save_pans(self._pans, ofilename, pansi_check, yozi_check,
-                  jomun_check, refpan_check, allcon_check)
-        alert = QMessageBox()
-        ofilename = os.path.abspath(ofilename)
-        alert.setText("{} 저장되었습니다".format(ofilename))
-        alert.exec_()
+        text, okPressed = QInputDialog.getText(
+            self.view, "내보내기", "파일 이름 : ", QLineEdit.Normal, "")
+        if okPressed and text != "":
+            ofilename = "./{}".format(text)
+            if pansi_check:
+                ofilename += "_판시사항"
+            if yozi_check:
+                ofilename += "_판결요지"
+            if jomun_check:
+                ofilename += "_참조조문"
+            if refpan_check:
+                ofilename += "_참조판례"
+            if allcon_check:
+                ofilename += "_전문"
+            ofilename += ".docx"
+            save_pans(self._pans, ofilename, pansi_check, yozi_check,
+                      jomun_check, refpan_check, allcon_check)
+            alert = QMessageBox()
+            ofilename = os.path.abspath(ofilename)
+            alert.setText("{} 저장되었습니다".format(ofilename))
+            alert.exec_()

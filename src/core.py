@@ -78,26 +78,37 @@ def save_pans(pans, ofilename, p_check=True, y_check=True, j_check=True, r_check
     ofilename (str) : file path to save pans as docx file
     '''
     doc = Document()
+    pan_nums = ""
+    for pan in pans:
+        pan_nums += pan.num+"\n"
+
+    doc.add_heading("판례번호", level=1)
+    doc.add_paragraph(pan_nums)
+    doc.add_page_break()
+
     for pan in pans:
         doc.add_heading(pan.num, level=1)
 
-        if p_check and pan.pansi:
-            doc.add_heading("판시사항", level=2)
-            doc.add_paragraph(pan.pansi)
-        if y_check and pan.yozi:
-            doc.add_heading("판결요지", level=2)
-            doc.add_paragraph(pan.yozi)
-        if j_check and pan.jomun:
-            doc.add_heading("참조조문", level=2)
-            doc.add_paragraph(pan.jomun)
-        if r_check and pan.refpan:
-            doc.add_heading("참조판례", level=2)
-            doc.add_paragraph(pan.refpan)
-        if a_check and pan.allcon:
-            doc.add_heading("전문", level=2)
-            doc.add_paragraph(pan.allcon)
+        if pan.pansi or pan.yozi or pan.jomun or pan.refpan or pan.allcon:
+            if p_check and pan.pansi:
+                doc.add_heading("판시사항", level=2)
+                doc.add_paragraph(pan.pansi)
+            if y_check and pan.yozi:
+                doc.add_heading("판결요지", level=2)
+                doc.add_paragraph(pan.yozi)
+            if j_check and pan.jomun:
+                doc.add_heading("참조조문", level=2)
+                doc.add_paragraph(pan.jomun)
+            if r_check and pan.refpan:
+                doc.add_heading("참조판례", level=2)
+                doc.add_paragraph(pan.refpan)
+            if a_check and pan.allcon:
+                doc.add_heading("전문", level=2)
+                doc.add_paragraph(pan.allcon)
         else:
             doc.add_heading("내용이 없습니다", level=2)
+
+        doc.add_page_break()
 
     doc.save(ofilename)
     print("save: {}".format(os.path.abspath(ofilename)))
