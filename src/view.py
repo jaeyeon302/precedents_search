@@ -1,16 +1,15 @@
-#-*- coding:utf-8 -*-
+# -*- coding:utf-8 -*-
 from PyQt5.QtWidgets import *
 from view_eventBridge import EventBridge
+
+
 class MyWindow(QWidget):
     def __init__(self):
         super().__init__()
         self.setup_ui()
-        self.handler = EventBridge(
-            self.pannum_view,
-            self.pansi_view, self.yozi_view, self.jomun_view
-        )
+        self.handler = EventBridge(self)
         self.register_handler()
-    
+
     def setup_ui(self):
         base_layout = QHBoxLayout()
 
@@ -22,6 +21,8 @@ class MyWindow(QWidget):
         self.pansi_view = QTextBrowser()
         self.yozi_view = QTextBrowser()
         self.jomun_view = QTextBrowser()
+        self.refpan_view = QTextBrowser()
+        self.allcon_view = QTextBrowser()
         result_layout.addWidget(self.pannum_view)
         result_layout.addWidget(QLabel("판시사항"))
         result_layout.addWidget(self.pansi_view)
@@ -29,7 +30,11 @@ class MyWindow(QWidget):
         result_layout.addWidget(self.yozi_view)
         result_layout.addWidget(QLabel("참조조문"))
         result_layout.addWidget(self.jomun_view)
-        
+        result_layout.addWidget(QLabel("참조판례"))
+        result_layout.addWidget(self.refpan_view)
+        result_layout.addWidget(QLabel("전문"))
+        result_layout.addWidget(self.allcon_view)
+
         control_layout = QHBoxLayout()
         self.prev_btn = QPushButton("이전")
         self.next_btn = QPushButton("다음")
@@ -48,11 +53,15 @@ class MyWindow(QWidget):
         self.pansi_check = QCheckBox("판시사항")
         self.yozi_check = QCheckBox("판결요지")
         self.jomun_check = QCheckBox("참조조문")
+        self.refpan_check = QCheckBox("참조판례")
+        self.allcon_check = QCheckBox("전문")
         self.save_btn = QPushButton("저장")
         export_layout.addWidget(QLabel("내보내기"))
         export_layout.addWidget(self.pansi_check)
         export_layout.addWidget(self.yozi_check)
         export_layout.addWidget(self.jomun_check)
+        export_layout.addWidget(self.refpan_check)
+        export_layout.addWidget(self.allcon_check)
         export_layout.addWidget(self.save_btn)
 
         rv_layout.addLayout(input_layout)
@@ -64,7 +73,7 @@ class MyWindow(QWidget):
 
     def register_handler(self):
         self.txt_input.textChanged.connect(
-            lambda: self.handler.input_handler(self.txt_input)
+            self.handler.input_handler
         )
         self.prev_btn.clicked.connect(
             self.handler.prev_btn_handler
@@ -73,10 +82,5 @@ class MyWindow(QWidget):
             self.handler.next_btn_handler
         )
         self.save_btn.clicked.connect(
-            lambda: self.handler.save_btn_handler(
-                self.pansi_check.isChecked(),
-                self.yozi_check.isChecked(),
-                self.jomun_check.isChecked()
-            )
+            self.handler.save_btn_handler
         )
-

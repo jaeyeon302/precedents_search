@@ -1,56 +1,79 @@
+import os
 from PyQt5.QtWidgets import QMessageBox
 from core import get_pan, save_pans
+
+
 class EventBridge():
-    def __init__(self,
-                pannum_view, 
-                pansi_view, yozi_view, jomun_view):
-        self._pn_view = pannum_view
-        self._p_view = pansi_view
-        self._y_view = yozi_view
-        self._j_view = jomun_view
+    def __init__(self, view_instance):
+        self.view = view_instance
+        self._pn_view = view_instance.pannum_view
+        self._p_view = view_instance.pansi_view
+        self._y_view = view_instance.yozi_view
+        self._j_view = view_instance.jomun_view
+        self._r_view = view_instance.refpan_view
+        self._a_view = view_instance.allcon_view
         self._pans_idx = 0
         self._pans = []
 
     @property
     def pannum(self):
-        return self._pn_view.text()
-    
+        return self.view.pannum_view.text()
+
     @pannum.setter
     def pannum(self, val):
-        self._pn_view.setText(val)
-    
+        self.view.pannum_view.setText(val)
+
     @property
     def pansi(self):
-        return self._p_view.toPlainText()
+        return self.view.pansi_view.toPlainText()
 
     @pansi.setter
     def pansi(self, val):
-        self._p_view.setText(val)
+        self.view.pansi_view.setText(val)
 
     @property
     def yozi(self):
-        return self._y_view.toPlainText()
-    
+        return self.view.yozi_view.toPlainText()
+
     @yozi.setter
     def yozi(self, val):
-        self._y_view.setText(val)
+        self.view.yozi_view.setText(val)
 
     @property
     def jomun(self):
-        return self._j_view.toPlainText()
-    
+        return self.view.jomun_view.toPlainText()
+
     @jomun.setter
     def jomun(self, val):
-        self._j_view.setText(val)
-    
+        self.view.jomun_view.setText(val)
+
+    @property
+    def refpan(self):
+        self.view.refpan_view.toPlainText()
+
+    @refpan.setter
+    def refpan(self, val):
+        self.view.refpan_view.setText(val)
+
+    @property
+    def allcon(self):
+        self.view.allcon_view.toPlainText()
+
+    @allcon.setter
+    def allcon(self, val):
+        self.view.allcon_view.setText(val)
+
     def _update_view(self, pan):
         self.pansi = pan.pansi
         self.yozi = pan.yozi
         self.jomun = pan.jomun
-        self.pannum = "{} ({}/{})".format(pan.num, self._pans_idx+1, len(self._pans))
+        self.refpan = pan.refpan
+        self.allcon = pan.allcon
+        self.pannum = "{} ({}/{})".format(pan.num,
+                                          self._pans_idx+1, len(self._pans))
 
-    def input_handler(self, txt_input):
-        txt = txt_input.toPlainText()
+    def input_handler(self):
+        txt = self.view.txt_input.toPlainText()
         if txt[-1] == '\n':
             nums = txt.split(',')
             nums = [n.lstrip().rstrip() for n in nums]
@@ -60,7 +83,7 @@ class EventBridge():
                 self.jomun = ""
             self._pans = [get_pan(num) for num in nums]
             self._update_view(self._pans[0])
-            txt_input.setPlainText(txt.lstrip().rstrip())
+            self.view.txt_input.setPlainText(txt.lstrip().rstrip())
 
     def prev_btn_handler(self):
         if self._pans_idx > 0:
@@ -71,15 +94,31 @@ class EventBridge():
         if len(self._pans) > self._pans_idx + 1:
             self._pans_idx += 1
             self._update_view(self._pans[self._pans_idx])
-    
-    def save_btn_handler(self, pansi_check, yozi_check, jomun_check):
+
+    def save_btn_handler(self):
         nums = [p.num for p in self._pans]
         ofilename = "./{}".format(nums)
-        if pansi_check: ofilename += "_판시사항"
-        if yozi_check: ofilename += "_판결요지"
-        if jomun_check: ofilename += "_참조조문"
+        pansi_check = self.view.pansi_check.isChecked()
+        yozi_check = self.view.yozi_check.isChecked()
+        jomun_check = self.view.jomun_check.isChecked()
+        refpan_check = self.view.refpan_check.isChecked()
+        allcon_check = self.view.allcon_check.isChecked()
+
+        if pansi_check:
+            ofilename += "_판시사항"
+        if yozi_check:
+            ofilename += "_판결요지"
+        if jomun_check:
+            ofilename += "_참조조문"
+        if refpan_check:
+            ofilename += "_참조판례"
+        if allcon_check:
+            ofilename += "_전문"
+
         ofilename += ".docx"
-        save_pans(self._pans, ofilename, pansi_check, yozi_check, jomun_check)
+        save_pans(self._pans, ofilename, pansi_check, yozi_check,
+                  jomun_check, refpan_check, allcon_check)
         alert = QMessageBox()
+        ofilename = os.path.abspath(ofilename)
         alert.setText("{} 저장되었습니다".format(ofilename))
-        alert.exec_()  
+        alert.exec_()
