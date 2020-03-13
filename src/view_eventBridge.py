@@ -74,6 +74,8 @@ class EventBridge():
 
     def input_handler(self):
         txt = self.view.txt_input.toPlainText()
+        if len(txt) == 0:
+            return
         if txt[-1] == '\n':
             nums = txt.split(',')
             nums = [n.lstrip().rstrip() for n in nums]

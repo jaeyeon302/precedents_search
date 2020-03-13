@@ -47,6 +47,9 @@ def __parse_pan(txt):
 
 def __split_number_list(txt):
     otxt = ""
+    if txt is None:
+        return otxt
+
     for c, next_c in zip(txt, txt[1:]):
         if (c == "[" or c == "(") and next_c.isnumeric():
             otxt += "\n"
@@ -58,6 +61,7 @@ def __split_number_list(txt):
 
 
 def get_pan(pan_num):
+    print(pan_num)
     url = "{}/판례/({})".format(__BASE_URL, pan_num)
     website = __get_bs_obj(parse.quote(url))  # handle the hangeul url
     pansrc = website.body.find('iframe', {'name': 'lawService'})
