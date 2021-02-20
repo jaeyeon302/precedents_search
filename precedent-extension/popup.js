@@ -54,7 +54,6 @@ function Precedent(precedentID,precedentText){
                         '<div class="title">' + this.precedentID + '</div>'+
                         '<div class="error">' + "잘못된 판례번호! 이거나" + '</div>'+
                         '<div>' + "국가법령정보센터 한글 판례 검색에서 못 찾았을 수 있습니다."+"</div>"+
-                        '<div> <a href="www.google.com/search?q='+this.precedentID+'"> 해당 판례 Google 검색 바로가기</a></div>'+
                         
                     '</div>';
         }
@@ -112,24 +111,15 @@ function addOnLoad(fn){
         fn();
     };
  }
- $('body').on('click', 'a[target="_blank"]', function(e){
-    e.preventDefault();
-    var port = chrome.extension.connect({
-            name: "Sample Communication"
-    });
-    port.postMessage("Hi BackGround");
-    port.onMessage.addListener(function(msg) {
-            console.log("message recieved" + msg);
-    });
-    chrome.tabs.create({url: $(this).prop('href'), active: false});
-    return false;
-});
+
 
 $(document).ready(function(){
     let newDataLoaded = false;
     var precedents = null;
 
+        
     $('#submit').click(function(){
+        
         precedents = null;
         let numbers = $('.numbers').val();
         numbers = numbers.trim();
