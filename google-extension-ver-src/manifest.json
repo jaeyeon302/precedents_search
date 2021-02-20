@@ -1,0 +1,13 @@
+{
+    "name": "판례 모으기",
+    "description": "판례번호를 입력해 한국 판례를 모아보는 프로그램입니다.",
+    "version": "1.0",
+    "manifest_version": 2,
+    "action":{
+        "default_popup":"popup.html"
+    },
+    "permissions":["webRequest","https://www.law.go.kr/*"],
+    "background":{
+      "scripts":["background.js"]
+    }
+  }
