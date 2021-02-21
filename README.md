@@ -1,4 +1,6 @@
-# case_search
+# case_search (Chrome extension ver)
+
+# case_search (PyQt5 ver)
 대한민국 판례를 찾는 PyQt5 프로그램입니다. ___2002도995_, _2012다13507___ 같은 판례번호를 입력하면 해당 판례를 가져와 __판시사항, 판결요지, 참조조문__ 을 저장할 수 있게해주는 프로그램입니다.
 
 ![GUI of this app](https://user-images.githubusercontent.com/20160167/76059249-ae8ca080-5fc1-11ea-8d7f-ebb59d7cd77f.png)
