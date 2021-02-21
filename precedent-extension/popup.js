@@ -1,8 +1,13 @@
 
 var updateDownloadProgressID = null;
+//replaceAll prototype 선언
+String.prototype.replaceAll = function(org, dest) {
+    return str.replace(/#/gi, ""); 
+}
 
-function Precedent(precedentID,precedentText){
+function Precedent(precedentID,precedentText,idx=-1){
     let splitted = precedentText.split('\n');
+    this.idx = idx;
     this.text = precedentText;
     this.precedentID = precedentID;
     this.pansi = ""
@@ -15,6 +20,11 @@ function Precedent(precedentID,precedentText){
     for(let i = 0 ; i<splitted.length-1; i++){
         let line = splitted[i];
         let nextLine = splitted[i+1].trim();
+        nextLine = nextLine.replace(/】\n/gi, "】"); 
+        nextLine = nextLine.replace(/【/gi, "\n【");
+        nextLine = nextLine.replace(/\t/gi, ""); 
+        nextLine = nextLine.replace(/  /gi, ""); 
+
         if(line.includes('【판시사항】')){
             this.succeess = true;
             this.pansi = nextLine;
@@ -33,6 +43,10 @@ function Precedent(precedentID,precedentText){
             for(let j=i+2;j<splitted.length;j++){
                 allLines = allLines + splitted[j];
             }
+            allLines = allLines.replace(/】\n/gi, "】"); 
+            allLines = allLines.replace(/【/gi, "\n【"); 
+            allLines = allLines.replace(/\t/gi, ""); 
+            allLines = allLines.replace(/  /gi, ""); 
             this.all = allLines;
         }
     }
@@ -47,13 +61,13 @@ function Precedent(precedentID,precedentText){
                         '<div class="subtitle">' + "참조판례" + '</div>'+
                         '<div class="content">' + this.reference + '</div>'+
                         '<div class="subtitle">' + "전문" + '</div>'+
-                        '<div class="content">' + this.all + '</div>'+
+                        '<pre class="content">' + this.all + '</pre>'+
                     '</div>';
         }else{
             return '<div class="slide error-slide">'+
                         '<div class="title">' + this.precedentID + '</div>'+
                         '<div class="error">' + "잘못된 판례번호! 이거나" + '</div>'+
-                        '<div>' + "국가법령정보센터 한글 판례 검색에서 못 찾았을 수 있습니다."+"</div>"+
+                        '<div>' + "국가법령정보 한글 판례 검색에서 못 찾았을 수 있습니다."+"</div>"+
                         
                     '</div>';
         }
@@ -82,18 +96,18 @@ function getPrecedents(numbers){
                     result=>{
                         let content=domParser.parseFromString(result,'text/html');
                         content = $(content).find('.pgroup')[0].innerText;
-                        cases.push(new Precedent(numbers[i], content));
+                        cases.push(new Precedent(numbers[i], content, i));
                         progressCount += 1;
                     }
                 ).catch(err=>{
                     console.log(err);
-                    let precedent = new Precedent(numbers[i],"");
+                    let precedent = new Precedent(numbers[i],"",i);
                     cases.push(precedent);
                 })
             }
         ).catch(err=>{
             console.log(err);
-            let precedent = new Precedent(numbers[i],"");
+            let precedent = new Precedent(numbers[i],"",i);
             cases.push(precedent);
         })
     }
@@ -146,6 +160,17 @@ $(document).ready(function(){
                 console.log(precedents);
                 newDataLoaded = true
                 slideContainer.empty();
+
+                precedents.sort((a,b)=>{
+                    if(a.idx > b.idx){
+                        return 1;
+                    }else if(a.idx < b.idx){
+                        return -1;
+                    }else{
+                        return 0;
+                    }
+                });
+
                 precedents.map(it=>{
                     slideContainer.append(it.makeSlide());
                 });                
@@ -175,12 +200,82 @@ $(document).ready(function(){
             doc.addSection({
                 properties:{},
                 children:failures
-
             })
+
+            let saveOption = $("input:checkbox[name=save]").filter((it,elem)=>elem.checked)
+                                                           .map((it,elem)=>elem.value)
+            saveOption = saveOption.toArray();
 
             for(let i = 0; i<precedents.length;i++){
                 let element = precedents[i];
                 if(element.succeess){
+                    let children = [];
+                    children.push(
+                        new docx.Paragraph({
+                            text:"\n"+element.precedentID+"\n",
+                            heading:docx.HeadingLevel.HEADING_1,
+                            bold:true,
+                            color:"000000", 
+
+                        })
+                    )
+                    if(saveOption.includes("pansi")){
+                        children.push( 
+                            new docx.Paragraph({
+                                text:"\n판시사항\n",
+                                heading: docx.HeadingLevel.HEADING_2,
+                                bold:true
+                            })
+                        )
+                        children.push(
+                            new docx.Paragraph({
+                                children:[
+                                    new docx.TextRun("\n"+element.pansi)
+                                ]
+                            })
+                        )
+                    }
+                    if(saveOption.includes("yozi")){
+                        children.push( 
+                            new docx.Paragraph({
+                                text:"\n판결요지\n",
+                                heading: docx.HeadingLevel.HEADING_2,
+                                bold:true
+                            })
+                        )
+                        children.push(
+                            new docx.Paragraph({
+                                children:[
+                                    new docx.TextRun("\n"+element.yozi)
+                                ]
+                            })
+                        )
+                    }
+                    if(saveOption.includes("reference")){
+                        children.push(new docx.Paragraph({
+                            text:"\n참조판례\n",
+                            heading: docx.HeadingLevel.HEADING_2,
+                            bold:true
+                        }))
+                        children.push(new docx.Paragraph({
+                            children:[
+                                new docx.TextRun("\n"+element.reference)
+                            ]
+                        }))
+                    }
+                    if(saveOption.includes("all")){
+                        children.push(new docx.Paragraph({
+                            text:"\n전문\n",
+                            heading: docx.HeadingLevel.HEADING_2,
+                            bold:true
+                        }))
+                        children.push(new docx.Paragraph({
+                            children:[
+                                new docx.TextRun("\n"+element.all+"\n")
+                            ]
+                        }))
+                    }
+
                     doc.addSection({
                         properties:{},
                         headers:{
@@ -188,55 +283,7 @@ $(document).ready(function(){
                                 children:[new docx.Paragraph(element.precedentID)]
                             })
                         },
-                        children:[
-                            new docx.Paragraph({
-                                text:"\n"+element.precedentID+"\n",
-                                heading:docx.HeadingLevel.HEADING_1,
-                                bold:true,
-                                color:"000000", 
-
-                            }),
-                            new docx.Paragraph({
-                                text:"\n판시사항\n",
-                                heading: docx.HeadingLevel.HEADING_2,
-                                bold:true
-                            }),
-                            new docx.Paragraph({
-                                children:[
-                                    new docx.TextRun("\n"+element.pansi)
-                                ]
-                            }),
-                            new docx.Paragraph({
-                                text:"\n판결요지\n",
-                                heading: docx.HeadingLevel.HEADING_2,
-                                bold:true
-                            }),
-                            new docx.Paragraph({
-                                children:[
-                                    new docx.TextRun("\n"+element.yozi)
-                                ]
-                            }),
-                            new docx.Paragraph({
-                                text:"\n참조판례\n",
-                                heading: docx.HeadingLevel.HEADING_2,
-                                bold:true
-                            }),
-                            new docx.Paragraph({
-                                children:[
-                                    new docx.TextRun("\n"+element.reference)
-                                ]
-                            }),
-                            new docx.Paragraph({
-                                text:"\n전문\n",
-                                heading: docx.HeadingLevel.HEADING_2,
-                                bold:true
-                            }),
-                            new docx.Paragraph({
-                                children:[
-                                    new docx.TextRun("\n"+element.all+"\n")
-                                ]
-                            })
-                        ]
+                        children:children
                     })
                 }
 
@@ -244,7 +291,13 @@ $(document).ready(function(){
                
             docx.Packer.toBlob(doc).then(blob=>{
                 console.log(blob);
-                saveAs(blob,"판례.docx");
+                let name = ""
+                if(saveOption.includes("pansi")) name += "_판시사항";
+                if(saveOption.includes("yozi")) name += "_판결요지";
+                if(saveOption.includes("reference")) name += "_참조판례";
+                if(saveOption.includes("all")) name += "_전문";
+                name = "판례"+name+".docx"
+                saveAs(blob,name);
             })
 
         }else{

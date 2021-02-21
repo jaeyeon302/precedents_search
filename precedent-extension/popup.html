@@ -11,7 +11,8 @@
     <body>
         <div class="container">
             <h3>판례 모으기</h3>
-            <div><a href="https://www.law.go.kr/">국가법령정보센터</a>에서 판례를 가져오고 있습니다.</div>
+            <div><a href="https://www.law.go.kr/">국가법령정보</a>에서 판례를 가져오고 있습니다.</div>
+            <div>가져오는데 실패한 것은 <a href="https://glaw.scourt.go.kr/wsjo/intesrch/sjo022.do">종합법률정보</a>를 참고하세요</div>
             <h1 class="progress">
                 Download : <span id="percent"></span>
             </h1>
@@ -24,6 +25,10 @@
                 <textarea class="numbers" placeholder="2002도995,2012다13507"></textarea>
                 <button id="submit">입력!</button>
                 <button id="save">저장! (docx 파일)</button>
+                <input type="checkbox" name="save" value="pansi">판시사항</input>
+                <input type="checkbox" name="save" value="yozi">판결요지</input>
+                <input type="checkbox" name="save" value="reference">참조판례</input>
+                <input type="checkbox" name="save" value="all">전문</input>
             </div>
             <div class="slide-container">
 
